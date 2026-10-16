@@ -43,8 +43,15 @@ module Exports
     }.freeze
 
     def self.clean_str(text)
-      # SEEDED FAULT: intentionally broken implementation bypassing transliteration
-      text.to_s
+      return '' if text.nil?
+
+      str = text.to_s
+      UNICODE_REPLACEMENTS.each do |target, replacement|
+        str = str.gsub(target, replacement)
+      end
+
+      # Transcode to Windows-1252, replacing any unhandled glyph with '?'
+      str.encode('Windows-1252', invalid: :replace, undef: :replace, replace: '?')
     end
 
     def initialize(portfolio:, vacancy: nil)
